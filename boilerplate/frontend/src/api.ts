@@ -1,15 +1,14 @@
-import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
-import { contracts, witnesses, type EligibilityPrivateState } from '@midnight-ntwrk/contract';
-import { type MidnightProvider, type WalletProvider, type PrivateStateProvider } from '@midnight-ntwrk/midnight-js-types';
-import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
-import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
-import { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
-import { assertIsContractAddress, toHex } from '@midnight-ntwrk/midnight-js-utils';
-import { type DAppConnectorAPI, type DAppConnectorWalletAPI } from '@midnight-ntwrk/dapp-connector-api';
-import { type Logger } from 'pino';
-import { currentConfig, contractConfig } from './config.js';
+// api.ts - Frontend API layer for Medical Eligibility Verification
+//
+// NOTE: @midnight-ntwrk/compact-runtime is a CJS+WASM module that cannot be
+// statically imported in the browser. All contract/runtime imports are done
+// lazily inside functions so that the UI can render first.
 
-const contractModule = contracts.MedicalEligibilityVerification;
+import type { MidnightProvider, WalletProvider, PrivateStateProvider } from '@midnight-ntwrk/midnight-js-types';
+import type { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
+import type { DAppConnectorAPI, DAppConnectorWalletAPI } from '@midnight-ntwrk/dapp-connector-api';
+import type { Logger } from 'pino';
+import { currentConfig, contractConfig } from './config.js';
 
 export type EligibilityLedgerState = {
   verificationCount: bigint;
@@ -20,9 +19,9 @@ export type EligibilityLedgerState = {
 export type EligibilityProviders = {
   walletProvider: WalletProvider;
   midnightProvider: MidnightProvider;
-  publicDataProvider: ReturnType<typeof indexerPublicDataProvider>;
+  publicDataProvider: any;
   zkConfigProvider: FetchZkConfigProvider<'verifyEligibility'>;
-  proofProvider: ReturnType<typeof httpClientProofProvider>;
+  proofProvider: any;
   privateStateProvider: PrivateStateProvider;
 };
 
@@ -65,6 +64,11 @@ export const configureProviders = async (
     submitTx: walletAPI.submitTransaction.bind(walletAPI),
   };
 
+  // Dynamically import Midnight SDK providers so they don't load at startup
+  const { indexerPublicDataProvider } = await import('@midnight-ntwrk/midnight-js-indexer-public-data-provider');
+  const { httpClientProofProvider } = await import('@midnight-ntwrk/midnight-js-http-client-proof-provider');
+  const { FetchZkConfigProvider } = await import('@midnight-ntwrk/midnight-js-fetch-zk-config-provider');
+
   return {
     publicDataProvider: indexerPublicDataProvider(currentConfig.indexer, currentConfig.indexerWS),
     zkConfigProvider: new FetchZkConfigProvider<'verifyEligibility'>(
@@ -79,37 +83,43 @@ export const configureProviders = async (
 };
 
 // ============================================================
-// Ledger Queries
+// Ledger Queries — lazy import to avoid WASM crash at startup
 // ============================================================
 export const getEligibilityLedgerState = async (
   providers: EligibilityProviders,
-  contractAddress: ContractAddress
+  contractAddress: string
 ): Promise<EligibilityLedgerState | null> => {
-  assertIsContractAddress(contractAddress);
-  const contractState = await providers.publicDataProvider.queryContractState(contractAddress);
-  if (contractState == null) return null;
+  try {
+    const { assertIsContractAddress } = await import('@midnight-ntwrk/midnight-js-utils');
+    assertIsContractAddress(contractAddress as any);
+    const contractState = await providers.publicDataProvider.queryContractState(contractAddress as any);
+    if (contractState == null) return null;
 
-  const ledger = contractModule.ledger(contractState.data);
-  return {
-    verificationCount: ledger.verificationCount ?? 0n,
-    eligibleCount: ledger.eligibleCount ?? 0n,
-    ineligibleCount: ledger.ineligibleCount ?? 0n,
-  };
+    const { contracts } = await import('@midnight-ntwrk/contract');
+    const contractModule = contracts.MedicalEligibilityVerification;
+    const ledger = contractModule.ledger(contractState.data);
+    return {
+      verificationCount: ledger.verificationCount ?? 0n,
+      eligibleCount: ledger.eligibleCount ?? 0n,
+      ineligibleCount: ledger.ineligibleCount ?? 0n,
+    };
+  } catch (e) {
+    logger?.error('Failed to query ledger state (runtime may not be available in browser):' + e);
+    return null;
+  }
 };
 
 // ============================================================
-// Contract Interactions (via Midnight SDK 2.x which might need different structure, 
-// but we will use the standard deployContract API if we had it, but here we only need to verify)
-// Actually, let's just interact with it directly.
-// The frontend needs @midnight-ntwrk/midnight-js-contracts
+// Contract Interactions — all lazy to avoid WASM crash
 // ============================================================
-import { deployContract, findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
-
 export const joinEligibilityContract = async (
   providers: EligibilityProviders,
   contractAddress: string,
-  initialPrivateState: EligibilityPrivateState
+  initialPrivateState: any
 ) => {
+  const { findDeployedContract } = await import('@midnight-ntwrk/midnight-js-contracts');
+  const { contracts, witnesses } = await import('@midnight-ntwrk/contract');
+  const contractModule = contracts.MedicalEligibilityVerification;
   const eligibilityContractInstance = new contractModule.Contract(witnesses);
 
   return findDeployedContract(providers, {
@@ -122,8 +132,11 @@ export const joinEligibilityContract = async (
 
 export const deployEligibilityContract = async (
   providers: EligibilityProviders,
-  initialPrivateState: EligibilityPrivateState
+  initialPrivateState: any
 ) => {
+  const { deployContract } = await import('@midnight-ntwrk/midnight-js-contracts');
+  const { contracts, witnesses } = await import('@midnight-ntwrk/contract');
+  const contractModule = contracts.MedicalEligibilityVerification;
   const eligibilityContractInstance = new contractModule.Contract(witnesses);
 
   return deployContract(providers, {
@@ -137,8 +150,9 @@ export const verifyEligibility = async (
   providers: EligibilityProviders,
   contractAddress: string,
   minAge: number,
-  privateState: EligibilityPrivateState
+  privateState: any
 ): Promise<boolean> => {
+  const { toHex } = await import('@midnight-ntwrk/midnight-js-utils');
   logger?.info(`Joining contract at ${contractAddress}...`);
   const joined = await joinEligibilityContract(providers, contractAddress, privateState);
 
@@ -147,10 +161,9 @@ export const verifyEligibility = async (
   
   logger?.info(`Tx submitted: ${toHex(txData.public.txId as unknown as Uint8Array)}`);
 
-  // Wait briefly then read state
   await new Promise(r => setTimeout(r, 2000));
-  const state = await getEligibilityLedgerState(providers, contractAddress as ContractAddress);
+  const state = await getEligibilityLedgerState(providers, contractAddress);
   
   if (!state) return false;
-  return state.eligibleCount > 0n; // In a real app we'd track the delta or events, but this works for demo
+  return state.eligibleCount > 0n;
 };

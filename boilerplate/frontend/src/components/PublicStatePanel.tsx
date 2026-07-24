@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { type DAppConnectorAPI } from '@midnight-ntwrk/dapp-connector-api';
-import { type ContractAddress } from '@midnight-ntwrk/compact-runtime';
 import { configureProviders, getEligibilityLedgerState, type EligibilityLedgerState } from '../api.js';
 
 export const PublicStatePanel: React.FC<{
@@ -24,8 +23,7 @@ export const PublicStatePanel: React.FC<{
       setError('');
       try {
         const providers = await configureProviders(connectorAPI, walletAPI);
-        // Cast to any to bypass strict type checking for ContractAddress in this demo
-        const ledgerState = await getEligibilityLedgerState(providers, contractAddress as unknown as ContractAddress);
+        const ledgerState = await getEligibilityLedgerState(providers, contractAddress);
         setState(ledgerState);
       } catch (err) {
         console.error(err);

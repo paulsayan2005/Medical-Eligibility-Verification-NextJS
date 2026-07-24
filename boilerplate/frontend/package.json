@@ -21,9 +21,11 @@
     "@midnight-ntwrk/midnight-js-types": "2.0.1",
     "@midnight-ntwrk/midnight-js-utils": "2.0.1",
     "@midnight-ntwrk/wallet-api": "5.0.0",
+    "lucide-react": "^1.26.0",
     "pino": "^9.7.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.1",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
@@ -34,6 +36,7 @@
     "oxlint": "^1.71.0",
     "typescript": "~6.0.2",
     "vite": "^8.0.0",
-    "vite-plugin-wasm": "^3.3.0"
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.6.0"
   }
 }

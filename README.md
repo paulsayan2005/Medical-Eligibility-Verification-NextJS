@@ -1,5 +1,8 @@
 # Medical Eligibility Verification (Midnight Network dApp)
 
+![Landing Page](boilerplate/frontend/public/landing.png)
+![App Dashboard](boilerplate/frontend/public/app.png)
+
 This project is a full-stack Midnight Network decentralized application that implements **Private Allowlist Access / Confidential Credentials** for Medical Eligibility Verification.
 
 ## Product Proposal

@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { createEligibilityPrivateState, hashPolicyId } from '@midnight-ntwrk/contract';
 import { type DAppConnectorAPI } from '@midnight-ntwrk/dapp-connector-api';
 import { configureProviders, deployEligibilityContract, joinEligibilityContract, verifyEligibility } from '../api.js';
+
+// Lazy helper — only load WASM contract module when actually needed
+const getContractHelpers = async () => {
+  const mod = await import('@midnight-ntwrk/contract');
+  return { createEligibilityPrivateState: mod.createEligibilityPrivateState, hashPolicyId: mod.hashPolicyId };
+};
 
 export const EligibilityForm: React.FC<{
   connectorAPI: DAppConnectorAPI;
@@ -18,9 +23,10 @@ export const EligibilityForm: React.FC<{
   const [error, setError] = useState<string>('');
   const [result, setResult] = useState<boolean | null>(null);
 
-  const getPrivateState = () => {
+  const getPrivateState = async () => {
     const ageNum = parseInt(age, 10);
     if (isNaN(ageNum) || ageNum < 0 || ageNum > 255) throw new Error('Age must be 0-255');
+    const { createEligibilityPrivateState, hashPolicyId } = await getContractHelpers();
     return createEligibilityPrivateState(ageNum, hashPolicyId(policyId.trim()));
   };
 
@@ -31,7 +37,7 @@ export const EligibilityForm: React.FC<{
       setResult(null);
       
       const providers = await configureProviders(connectorAPI, walletAPI);
-      const state = getPrivateState();
+      const state = await getPrivateState();
       const deployed = await deployEligibilityContract(providers, state);
       
       setContractAddress(deployed.deployTxData.public.contractAddress as string);
@@ -53,7 +59,7 @@ export const EligibilityForm: React.FC<{
       if (!contractAddress) throw new Error('Enter a contract address first');
       
       const providers = await configureProviders(connectorAPI, walletAPI);
-      const state = getPrivateState();
+      const state = await getPrivateState();
       await joinEligibilityContract(providers, contractAddress, state);
       
       onStateUpdate();
@@ -77,7 +83,7 @@ export const EligibilityForm: React.FC<{
       if (isNaN(minAgeNum) || minAgeNum < 0 || minAgeNum > 255) throw new Error('Min Age must be 0-255');
       
       const providers = await configureProviders(connectorAPI, walletAPI);
-      const state = getPrivateState();
+      const state = await getPrivateState();
       
       const isEligible = await verifyEligibility(providers, contractAddress, minAgeNum, state);
       setResult(isEligible);
