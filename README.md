@@ -63,4 +63,5 @@ When a patient verifies eligibility, a Zero-Knowledge proof is generated locally
 ## Known Limitations / Notes
 
 - **Dynamic Imports in Tests**: Node/Vitest has issues with dynamic module resolution for generated contract JS bundles. Static imports and a `sed` patch removing `checkRuntimeVersion` are implemented in the build step to ensure tests run smoothly.
-- **Vite Build**: The Vite build requires `vite-plugin-top-level-await` and `vite-plugin-wasm` to handle the `@midnight-ntwrk/onchain-runtime` WebAssembly.
+- **Vite 8 + Rolldown + Midnight WASM**: `@midnight-ntwrk/compact-runtime` uses CJS `require()` to load WASM with top-level await. Rolldown (Vite 8's bundler) does not support this combination. The fix is to externalize `@midnight-ntwrk/compact-runtime` and `@midnight-ntwrk/onchain-runtime` from the Vite bundle (`rollupOptions.external`). They are still available at runtime via the Midnight SDK's own WASM loader.
+- **Frontend Build Status**: `npm run build -w boilerplate/frontend` succeeds and produces a production-ready `dist/` bundle with WASM assets (`zswap`, `ledger`) correctly emitted.
