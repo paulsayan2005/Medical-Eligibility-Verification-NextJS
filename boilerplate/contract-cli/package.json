@@ -8,7 +8,7 @@
     "cli": "node --experimental-specifier-resolution=node --loader ts-node/esm src/cli.ts",
     "standalone": "docker compose -f standalone.yml pull && node --experimental-specifier-resolution=node --loader ts-node/esm src/standalone.ts",
     "testnet-remote": "node --experimental-specifier-resolution=node --loader ts-node/esm src/testnet-remote.ts",
-    "test": "vitest run --testPathPattern='eligibility.test.ts'",
+    "test": "vitest run src/test/eligibility.test.ts",
     "test-all": "vitest run",
     "test-api": "docker compose -f standalone.yml pull && DEBUG='testcontainers' vitest run",
     "build": "rm -rf dist && tsc --project tsconfig.build.json",
