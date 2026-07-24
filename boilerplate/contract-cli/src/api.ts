@@ -65,9 +65,9 @@ export const getEligibilityLedgerState = async (
 
   const ledger = contractModule.ledger(contractState.data);
   return {
-    verificationCount: ledger.verificationCount?.value ?? 0n,
-    eligibleCount: ledger.eligibleCount?.value ?? 0n,
-    ineligibleCount: ledger.ineligibleCount?.value ?? 0n,
+    verificationCount: ledger.verificationCount ?? 0n,
+    eligibleCount: ledger.eligibleCount ?? 0n,
+    ineligibleCount: ledger.ineligibleCount ?? 0n,
   };
 };
 
@@ -179,6 +179,7 @@ const createWalletAndMidnightProvider = async (wallet: Wallet & Resource) => {
   const state = await Rx.firstValueFrom(wallet.state());
   return {
     coinPublicKey: state.coinPublicKey,
+    encryptionPublicKey: state.encryptionPublicKey,
     balanceTx(
       tx: UnbalancedTransaction,
       newCoins: CoinInfo[]
@@ -186,18 +187,18 @@ const createWalletAndMidnightProvider = async (wallet: Wallet & Resource) => {
       return wallet.balanceTransaction(
         ZswapTransaction.deserialize(tx.serialize(getLedgerNetworkId()), getZswapNetworkId()),
         newCoins
-      );
+      ) as any;
     },
     submitTx(tx: BalancedTransaction): Promise<TransactionId> {
       return wallet.submitTransaction(tx);
     },
     watchForTxData(txId: TransactionId): Promise<FinalizedTxData> {
       return Rx.firstValueFrom(
-        wallet.transactions().pipe(
-          Rx.mergeMap((txs) => txs),
-          Rx.filter((tx) => tx.public.txId === txId)
+        (wallet as any).transactions().pipe(
+          Rx.map((txs: any) => txs.find((tx: any) => tx.public.txId === txId)),
+          Rx.filter((tx: any): tx is FinalizedTxData => tx !== undefined)
         )
-      );
+      ) as any;
     },
     proveTransaction(tx: UnbalancedTransaction): Promise<Transaction> {
       return Promise.resolve(tx as unknown as Transaction);

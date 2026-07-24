@@ -9,7 +9,7 @@ import type {
   UnbalancedTransaction,
 } from '@midnight-ntwrk/midnight-js-types';
 import type { PublicDataProvider } from '@midnight-ntwrk/midnight-js-types';
-import type { ZkConfigProvider } from '@midnight-ntwrk/midnight-js-types';
+import type { ZKConfigProvider } from '@midnight-ntwrk/midnight-js-types';
 import type { EligibilityPrivateState } from '@midnight-ntwrk/contract';
 
 // ============================================================
@@ -22,7 +22,7 @@ export type EligibilityProviders = {
   readonly walletProvider: WalletProvider;
   readonly midnightProvider: MidnightProvider;
   readonly publicDataProvider: PublicDataProvider;
-  readonly zkConfigProvider: ZkConfigProvider<string>;
+  readonly zkConfigProvider: ZKConfigProvider<string>;
 };
 
 // The deployed contract instance type (opaque — holds contract state)
