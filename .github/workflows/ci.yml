@@ -36,5 +36,8 @@ jobs:
     - name: Test Contract CLI (Vitest)
       run: npm run test -w boilerplate/contract-cli
 
+    - name: Type-check CLI
+      run: npm run typecheck -w boilerplate/contract-cli
+
     - name: Build Frontend
       run: npm run build -w boilerplate/frontend
