@@ -90,8 +90,6 @@ export const getEligibilityLedgerState = async (
   contractAddress: string
 ): Promise<EligibilityLedgerState | null> => {
   try {
-    const { assertIsContractAddress } = await import('@midnight-ntwrk/midnight-js-utils');
-    assertIsContractAddress(contractAddress as any);
     const contractState = await providers.publicDataProvider.queryContractState(contractAddress as any);
     if (contractState == null) return null;
 

@@ -17,6 +17,7 @@ import {
   type WalletProvider,
 } from '@midnight-ntwrk/midnight-js-types';
 import { type Resource, WalletBuilder } from '@midnight-ntwrk/wallet';
+// @ts-expect-error: Wallet interface is declared in wallet.d.ts but not re-exported at package level (Midnight SDK bug)
 import { type Wallet } from '@midnight-ntwrk/wallet-api';
 import { Transaction as ZswapTransaction } from '@midnight-ntwrk/zswap';
 import { webcrypto } from 'crypto';
@@ -77,7 +78,7 @@ export const getEligibilityLedgerState = async (
 export const deployEligibilityContract = async (
   providers: EligibilityProviders,
   initialPrivateState: EligibilityPrivateState
-) => {
+): Promise<import('@midnight-ntwrk/midnight-js-contracts').DeployedContract<InstanceType<typeof contractModule.Contract>>> => {
   logger?.info('Deploying Medical Eligibility Verification contract...');
 
   const eligibilityContractInstance = new contractModule.Contract(witnesses);
@@ -100,7 +101,7 @@ export const joinEligibilityContract = async (
   providers: EligibilityProviders,
   contractAddress: string,
   initialPrivateState: EligibilityPrivateState
-) => {
+): Promise<import('@midnight-ntwrk/midnight-js-contracts').FoundContract<InstanceType<typeof contractModule.Contract>>> => {
   const eligibilityContractInstance = new contractModule.Contract(witnesses);
 
   const joined = await findDeployedContract(providers, {
@@ -153,33 +154,33 @@ export const verifyEligibility = async (
 
 const waitForSyncProgress = async (wallet: Wallet) =>
   Rx.firstValueFrom(
-    wallet.state().pipe(
-      Rx.filter((s) => s.syncProgress !== null),
-      Rx.map((s) => s.syncProgress)
+    (wallet.state() as any).pipe(
+      Rx.filter((s: any) => s.syncProgress !== null),
+      Rx.map((s: any) => s.syncProgress)
     )
   );
 
 const waitForSync = async (wallet: Wallet) =>
   Rx.firstValueFrom(
-    wallet.state().pipe(
-      Rx.filter((s) => s.syncProgress?.synced === true || s.syncProgress !== null),
-      Rx.map((s) => s)
+    (wallet.state() as any).pipe(
+      Rx.filter((s: any) => s.syncProgress?.synced === true || s.syncProgress !== null),
+      Rx.map((s: any) => s)
     )
   );
 
 const waitForFunds = async (wallet: Wallet) =>
   Rx.firstValueFrom(
-    wallet.state().pipe(
-      Rx.map((s) => s.balances[nativeToken()] ?? 0n),
-      Rx.filter((balance) => balance > 0n)
+    (wallet.state() as any).pipe(
+      Rx.map((s: any) => s.balances[nativeToken()] ?? 0n),
+      Rx.filter((balance: any) => balance > 0n)
     )
   );
 
 const createWalletAndMidnightProvider = async (wallet: Wallet & Resource) => {
-  const state = await Rx.firstValueFrom(wallet.state());
+  const state = await Rx.firstValueFrom((wallet.state() as any));
   return {
-    coinPublicKey: state.coinPublicKey,
-    encryptionPublicKey: state.encryptionPublicKey,
+    coinPublicKey: (state as any).coinPublicKey,
+    encryptionPublicKey: (state as any).encryptionPublicKey,
     balanceTx(
       tx: UnbalancedTransaction,
       newCoins: CoinInfo[]
@@ -225,7 +226,7 @@ export const buildWalletAndWaitForFunds = async (
   );
   wallet.start();
 
-  const state = await Rx.firstValueFrom(wallet.state());
+  const state: any = await Rx.firstValueFrom((wallet.state() as any));
   logger?.info(`Wallet address: ${state.address}`);
 
   let balance = state.balances[nativeToken()];
