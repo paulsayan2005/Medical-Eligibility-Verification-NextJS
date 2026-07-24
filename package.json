@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "compile": "cd boilerplate/contract/src && rm -rf managed/medical-eligibility-verification && mkdir -p managed/medical-eligibility-verification && ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin medical-eligibility-verification.compact managed/medical-eligibility-verification && sed -i 's/.*checkRuntimeVersion.*//g' managed/medical-eligibility-verification/contract/index.js && echo '✅ Contract compiled' && cd ../../.. && npm run build -w boilerplate/contract",
+    "dev": "npm run dev -w boilerplate/frontend",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "cli": "npm run cli -w boilerplate/contract-cli",
