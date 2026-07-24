@@ -21,11 +21,12 @@ jobs:
 
     - name: Install Midnight Compact Compiler
       run: |
-        curl -L "https://github.com/midnight-ntwrk/compact/releases/download/v0.31.1/compactc-linux-x86_64.tar.gz" -o compactc.tar.gz
-        tar -xzf compactc.tar.gz
+        curl -L "https://github.com/midnightntwrk/compact/releases/download/compactc-v0.31.1/compactc_v0.31.1_x86_64-unknown-linux-musl.zip" -o compactc.zip
+        unzip -o compactc.zip -d compact-tools
         mkdir -p ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl
-        mv compactc ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin
-        chmod +x ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin
+        mv compact-tools/* ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/
+        chmod +x ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/*
+        echo "$HOME/.compact/versions/0.31.1/x86_64-unknown-linux-musl" >> $GITHUB_PATH
 
     - name: Install dependencies
       run: npm install
