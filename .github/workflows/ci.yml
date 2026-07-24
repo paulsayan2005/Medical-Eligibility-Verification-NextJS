@@ -32,7 +32,10 @@ jobs:
       run: npm install
 
     - name: Compile Contract
-      run: npm run build -w boilerplate/contract
+      run: |
+        mkdir -p boilerplate/contract/src/managed
+        npm run compact -w boilerplate/contract
+        npm run build -w boilerplate/contract
 
     - name: Test Contract CLI (Vitest)
       run: npm run test -w boilerplate/contract-cli
