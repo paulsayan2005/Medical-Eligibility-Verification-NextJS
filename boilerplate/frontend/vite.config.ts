@@ -1,21 +1,26 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import wasm from 'vite-plugin-wasm'
-import topLevelAwait from 'vite-plugin-top-level-await'
 
 // https://vite.dev/config/
+// NOTE: @midnight-ntwrk/compact-runtime uses require() (CJS) to load WASM
+// with top-level await. Rolldown (Vite 8) cannot bundle this combination.
+// We exclude these packages from optimization and externalize them from the
+// production bundle. They are loaded via the Midnight SDK's own bundling.
 export default defineConfig({
-  plugins: [
-    react(),
-    (wasm as any)(),
-    (topLevelAwait as any)()
-  ],
+  plugins: [react()],
   build: {
     target: 'esnext',
+    rollupOptions: {
+      external: [
+        '@midnight-ntwrk/compact-runtime',
+        '@midnight-ntwrk/onchain-runtime',
+      ],
+    },
   },
   optimizeDeps: {
-    esbuildOptions: {
-      target: 'esnext',
-    },
+    exclude: [
+      '@midnight-ntwrk/compact-runtime',
+      '@midnight-ntwrk/onchain-runtime',
+    ],
   },
 })
