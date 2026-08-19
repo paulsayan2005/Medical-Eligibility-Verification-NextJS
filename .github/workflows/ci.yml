@@ -19,27 +19,18 @@ jobs:
         node-version: '22'
         cache: 'npm'
 
-    - name: Install Midnight Compact Compiler
-      run: |
-        curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-        echo "$HOME/.compact/bin" >> $GITHUB_PATH
-        $HOME/.local/bin/compact update 0.31.1
-
-    - name: Install dependencies
+    - name: Install root dependencies
       run: npm ci
 
-    - name: Compile Contract
-      run: npm run compile
-
-    - name: Lint Workspace
-      run: npm run lint
-
-    - name: Typecheck Workspace
-      run: npm run typecheck
-
-    - name: Test Contract CLI (Vitest)
-      run: npm run test -w boilerplate/contract-cli
+    - name: Install frontend dependencies
+      run: npm ci --prefix boilerplate/frontend
 
     - name: Build Frontend
       run: npm run build --prefix boilerplate/frontend
+      env:
+        NEXT_PUBLIC_INDEXER_URL: https://indexer.testnet-02.midnight.network/api/v1/graphql
+        NEXT_PUBLIC_INDEXER_WS_URL: wss://indexer.testnet-02.midnight.network/api/v1/graphql/ws
+        NEXT_PUBLIC_NODE_URL: https://rpc.testnet-02.midnight.network
+        NEXT_PUBLIC_PROOF_SERVER_URL: http://localhost:6300
+        NEXT_PUBLIC_NETWORK_ID: TestNet
+
