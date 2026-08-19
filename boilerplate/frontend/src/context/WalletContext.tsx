@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { DAppConnectorAPI, DAppConnectorWalletAPI } from '@midnight-ntwrk/dapp-connector-api';
 
@@ -97,6 +99,19 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const scanWallets = useCallback((): DetectedWallet[] => {
     const wallets: DetectedWallet[] = [];
+    if (typeof window === 'undefined') {
+      return [
+        {
+          id: 'devnet-demo',
+          name: 'Midnight DevNet Demo Wallet',
+          icon: undefined,
+          isInstalled: true,
+          downloadUrl: '#',
+          isDemo: true,
+          description: 'Simulated wallet for quick testing & demonstration without extension',
+        },
+      ];
+    }
     const win = window as any;
 
     // 1. Midnight injected wallets (e.g. Lace Midnight)

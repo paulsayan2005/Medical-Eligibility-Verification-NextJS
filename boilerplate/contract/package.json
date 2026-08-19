@@ -22,7 +22,7 @@
   },
   "scripts": {
     "compact": "COMPACT_CMD=\"compact compile +0.31.1\"; if command -v compactc >/dev/null 2>&1 && compactc --version >/dev/null 2>&1; then COMPACT_CMD=\"compactc\"; fi; rm -rf src/managed/* && name=$(basename $(ls src/*.compact) .compact) && $COMPACT_CMD src/$name.compact src/managed/$name && sed -i 's/.*checkRuntimeVersion.*//g' src/managed/$name/contract/index.js",
-    "build": "rm -rf dist && tsc --project tsconfig.build.json && mkdir -p ./dist && cp -Rf ./src/managed ./dist/managed && cp ./src/*.compact ./dist && find ./dist/managed -name index.js -exec sed -i 's/.*checkRuntimeVersion.*//g' {} +",
+    "build": "node build.js",
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "dev": "npm run compact && npm run build"

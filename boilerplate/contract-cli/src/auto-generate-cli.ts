@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ContractAnalyzer } from './contract-analyzer.js';
 
 class CLIAutoGenerator {
@@ -8,7 +9,7 @@ class CLIAutoGenerator {
 
   constructor() {
     this.analyzer = new ContractAnalyzer();
-    this.outputDir = path.dirname(decodeURIComponent(new URL(import.meta.url).pathname));
+    this.outputDir = path.dirname(fileURLToPath(import.meta.url));
   }
 
   async generate(): Promise<void> {

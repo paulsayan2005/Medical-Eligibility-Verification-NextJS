@@ -12,10 +12,10 @@ export const contractConfig = {
   zkConfigPath: '/zkir/medical-eligibility-verification.zkir',
 };
 
-// Default standalone (local) config for browser
+// Default Preprod config for browser
 export const currentConfig: Config = {
-  indexer: import.meta.env.VITE_INDEXER_URL || 'http://127.0.0.1:8088/api/v1/graphql',
-  indexerWS: import.meta.env.VITE_INDEXER_WS_URL || 'ws://127.0.0.1:8088/api/v1/graphql/ws',
-  node: import.meta.env.VITE_NODE_URL || 'http://127.0.0.1:9944',
-  proofServer: import.meta.env.VITE_PROOF_SERVER_URL || 'http://127.0.0.1:6300',
+  indexer: process.env.NEXT_PUBLIC_INDEXER_URL || 'https://indexer.preprod.midnight.network/api/v4/graphql',
+  indexerWS: process.env.NEXT_PUBLIC_INDEXER_WS_URL || 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws',
+  node: process.env.NEXT_PUBLIC_NODE_URL || 'https://rpc.preprod.midnight.network',
+  proofServer: process.env.NEXT_PUBLIC_PROOF_SERVER_URL || 'http://127.0.0.1:6300',
 };

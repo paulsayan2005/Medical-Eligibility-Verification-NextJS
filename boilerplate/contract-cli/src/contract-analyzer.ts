@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export interface ContractFunction {
   name: string;
@@ -36,8 +37,8 @@ export class ContractAnalyzer {
   private contractAnalysis: ContractAnalysis | null = null;
 
   constructor() {
-    // Use relative path to the compiled contract - fix URL decoding
-    const currentDir = path.dirname(decodeURIComponent(new URL(import.meta.url).pathname));
+    // Use relative path to the compiled contract
+    const currentDir = path.dirname(fileURLToPath(import.meta.url));
     const contractSourceDir = path.resolve(currentDir, '..', '..', 'contract', 'src');
     const managedDir = path.join(contractSourceDir, 'managed');
 
@@ -104,8 +105,9 @@ export class ContractAnalyzer {
       const contractName = `${contractBaseName.charAt(0).toUpperCase() + contractBaseName.slice(1)} Contract`;
 
       // Find the witnesses.ts file
+      const currentDir = path.dirname(fileURLToPath(import.meta.url));
       const contractSourceDir = path.resolve(
-        path.dirname(decodeURIComponent(new URL(import.meta.url).pathname)),
+        currentDir,
         '..',
         '..',
         'contract',

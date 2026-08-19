@@ -41,10 +41,10 @@ class WalletKeyGenerator {
       // Set network to testnet before creating wallet
       setNetworkId(NetworkId.TestNet);
       
-      // Use testnet configuration
-      const indexer = 'https://indexer.testnet-02.midnight.network/api/v1/graphql';
-      const indexerWS = 'wss://indexer.testnet-02.midnight.network/api/v1/graphql/ws';
-      const node = 'https://rpc.testnet-02.midnight.network';
+      // Use preprod configuration
+      const indexer = 'https://indexer.preprod.midnight.network/api/v4/graphql';
+      const indexerWS = 'wss://indexer.preprod.midnight.network/api/v4/graphql/ws';
+      const node = 'https://rpc.preprod.midnight.network';
       const proofServer = 'http://127.0.0.1:6300';
       
       console.log('🔗 Creating testnet wallet to get address...');
