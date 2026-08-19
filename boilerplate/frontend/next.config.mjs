@@ -52,6 +52,24 @@ const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: path.join(__dirname, '../../'),
   transpilePackages: ['@midnight-ntwrk/contract'],
+
+  // Exclude Midnight network packages from SSR bundling —
+  // they use WebSocket / Node.js APIs that can't run on the server side.
+  serverExternalPackages: [
+    '@midnight-ntwrk/midnight-js-indexer-public-data-provider',
+    '@midnight-ntwrk/midnight-js-http-client-proof-provider',
+    '@midnight-ntwrk/midnight-js-fetch-zk-config-provider',
+    '@midnight-ntwrk/midnight-js-contracts',
+    '@midnight-ntwrk/midnight-js-utils',
+    '@midnight-ntwrk/midnight-js-types',
+    '@midnight-ntwrk/wallet-api',
+    '@midnight-ntwrk/dapp-connector-api',
+    '@midnight-ntwrk/compact-runtime',
+    '@midnight-ntwrk/ledger',
+    '@midnight-ntwrk/zswap',
+    'isomorphic-ws',
+  ],
+
   webpack: (config, { isServer, dev }) => {
     config.resolve.symlinks = false;
 
@@ -60,6 +78,9 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@midnight-ntwrk/contract': path.resolve(__dirname, '../../contract/src/index.ts'),
+      // Fix isomorphic-ws: in the browser, WebSocket is a global; provide a
+      // shim that exports it correctly so named imports work.
+      'isomorphic-ws': path.resolve(__dirname, 'src/shims/isomorphic-ws.js'),
     };
 
     // Allow .js imports to resolve .ts files (TS ESM convention)
@@ -100,3 +121,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
