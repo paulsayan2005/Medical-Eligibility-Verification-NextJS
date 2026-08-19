@@ -51,8 +51,23 @@ const __dirname = path.dirname(__filename);
 const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: path.join(__dirname, '../../'),
+  transpilePackages: ['@midnight-ntwrk/contract'],
   webpack: (config, { isServer, dev }) => {
     config.resolve.symlinks = false;
+
+    // Alias @midnight-ntwrk/contract to its TypeScript source
+    // (the .tgz package has no compiled dist/ folder)
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@midnight-ntwrk/contract': path.resolve(__dirname, '../../contract/src/index.ts'),
+    };
+
+    // Allow .js imports to resolve .ts files (TS ESM convention)
+    config.resolve.extensionAlias = {
+      '.js': ['.ts', '.tsx', '.js', '.jsx'],
+      '.cjs': ['.cts', '.cjs'],
+      '.mjs': ['.mts', '.mjs'],
+    };
     
     if (dev) {
       config.watchOptions = {
