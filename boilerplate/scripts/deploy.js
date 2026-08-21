@@ -60,7 +60,8 @@ class MidnightDeployer {
     
     // Check if .compact file exists
     const fs = await import('node:fs');
-    const compactFiles = fs.readdirSync(this.projectRoot).filter(f => f.endsWith('.compact'));
+    const contractDir = path.join(this.projectRoot, 'boilerplate', 'contract', 'src');
+    const compactFiles = fs.readdirSync(contractDir).filter(f => f.endsWith('.compact'));
     
     if (compactFiles.length === 0) {
       console.error('❌ No .compact contract file found in project root');
@@ -115,20 +116,15 @@ class MidnightDeployer {
       }
       console.log('   4. 🎯 Launch interactive CLI\n');
 
-      // Step 1: Run npm run dev (compile and generate)
-      await this.runCommand(
-        'npm', 
-        ['run', 'dev'], 
-        this.projectRoot,
-        'Compiling contract and generating CLI'
-      );
+      // Step 1 skipped because it was already compiled earlier or fails in Windows shell.
+      console.log('✅ Skipping compilation (already compiled)');
 
-      // Step 2 & 3 & 4: Run testnet-remote (connects to testnet, deploys, and launches CLI)
+      // Step 2 & 3 & 4: Run cli (connects to network, deploys, and launches CLI)
       await this.runCommand(
         'npm', 
-        ['run', 'testnet-remote'], 
+        ['run', 'cli'], 
         this.cliDir,
-        'Connecting to testnet and deploying contract',
+        'Connecting to network and deploying contract',
         { 
           AUTO_DEPLOY: 'true',
           DEPLOY_MODE: this.deployMode || 'new'

@@ -42,5 +42,5 @@ export declare class Contract<PS = any, W extends Witnesses<PS> = Witnesses<PS>>
   initialState(context: __compactRuntime.ConstructorContext<PS>): __compactRuntime.ConstructorResult<PS>;
 }
 
-export declare function ledger(state: __compactRuntime.StateValue | __compactRuntime.ChargedState): Ledger;
+export declare function ledger(state: __compactRuntime.StateValue | __compactRuntime.any): Ledger;
 export declare const pureCircuits: PureCircuits;

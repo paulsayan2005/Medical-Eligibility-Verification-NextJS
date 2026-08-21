@@ -1,6 +1,6 @@
 # Medical Eligibility Verification
 
-A privacy-preserving zero-knowledge medical eligibility verification platform built on the Midnight Network using Compact smart contracts.
+A Midnight dApp for Medical Eligibility Verification using Confidential Credentials (ZK proofs) to verify patient criteria without exposing sensitive data.
 
 ## Contract Address
 
@@ -10,68 +10,53 @@ A privacy-preserving zero-knowledge medical eligibility verification platform bu
 
 ## Features
 
-- **Zero-Knowledge Verification**: Prove medical eligibility without revealing exact age or policy ID.
-- **Privacy-Preserving State**: Private data remains exclusively on the user's local device.
-- **Midnight Lace Integration**: Seamlessly connect using the Midnight Lace wallet.
-- **Transparent Audit Log**: On-chain verification history of eligibility claims.
-- **Responsive Dashboard**: Built with Next.js and styled for modern aesthetics.
+*   **Zero-Knowledge Age Verification:** Verify a patient is above a certain age without revealing their actual date of birth.
+*   **Confidential Policy Verification:** Verify the patient holds a valid medical policy without revealing the policy ID on the public ledger.
+*   **Public Statistics:** Maintains a public, auditable tally of successful and failed eligibility checks.
+*   **Midnight Wallet Integration:** Full integration with the Midnight Lace wallet for transaction signing and proof generation.
 
 ## What This Project Does
 
-This project is a decentralized application (dApp) for verifying patient medical eligibility in a completely confidential manner. Traditional healthcare systems require patients to share highly sensitive information like exact age, policy number, and diagnosis codes. Instead, this dApp uses Midnight’s zero-knowledge proofs to allow a patient to mathematically prove they meet specific requirements (e.g., minimum age and a valid policy) while keeping the underlying data strictly private. Service providers receive a verifiable "eligible" or "ineligible" boolean result without ever seeing the patient's sensitive data.
+This project provides a decentralized system for medical clinics or pharmacies to verify if a patient is eligible for a specific treatment or medication. It ensures the patient meets age requirements and possesses valid insurance, all while completely protecting the patient's private medical information. The system uses zero-knowledge proofs to assert these facts on the Midnight blockchain. The public ledger only sees whether the verification succeeded or failed, not the underlying private data.
 
 ## Privacy Model
 
-- **Public Information**: Minimum age requirement, verification count, eligible/ineligible count, and the final eligibility boolean result.
-- **Private Information**: Patient's exact age (0-255) and their 32-byte Policy ID hash.
-- **What users prove without revealing**: Patients prove that their age is greater than or equal to the minimum age threshold, and that their policy hash is valid (not empty), without revealing the actual age or policy hash on the blockchain.
+*   **Public Information:** 
+    *   `verificationCount`: The total number of eligibility checks performed.
+    *   `eligibleCount`: The total number of successful eligibility checks.
+    *   `ineligibleCount`: The total number of failed eligibility checks.
+    *   The final eligibility result (Boolean) of each check.
+*   **Private Information:** 
+    *   The patient's actual age.
+    *   The patient's medical policy ID hash.
+*   **What users prove without revealing:** 
+    *   Users prove that their age is greater than or equal to a required `minAge` and that their `policyHash` is not empty, entirely off-chain using Zero-Knowledge (ZK) proofs. The network only verifies the proof without ever seeing the private inputs.
 
 ## Tech Stack
 
-- **Smart Contract**: Midnight Compact (`medical-eligibility-verification.compact`)
-- **Frontend**: Next.js (React), Tailwind CSS, TypeScript
-- **Wallet**: Midnight Lace Wallet Extension (`window.midnight.mnLace`)
-- **Tooling**: `@midnight-ntwrk/compact-compiler`, Node.js v22, Docker
+*   **Smart Contract:** Midnight Compact (TypeScript-like ZK language)
+*   **Frontend:** Next.js (React), Tailwind CSS
+*   **Blockchain SDK:** Midnight.js (V4)
+*   **Tooling:** Node.js, Docker (Midnight Proof Server)
 
 ## Folder Structure
 
-```
-Medical-Eligibility-Verification/
-├── boilerplate/
-│   ├── contract/
-│   │   └── src/
-│   │       ├── medical-eligibility-verification.compact
-│   │       ├── witnesses.ts
-│   │       └── index.ts
-│   ├── contract-cli/
-│   │   └── src/
-│   │       ├── cli.ts
-│   │       └── api.ts
-│   ├── frontend/
-│   │   ├── src/
-│   │   │   ├── app/
-│   │   │   ├── components/
-│   │   │   └── api.ts
-│   │   └── package.json
-│   └── scripts/
-├── PROPOSAL.md
-└── package.json
-```
+*   `boilerplate/contract/`: Contains the Midnight Compact smart contract (`medical-eligibility-verification.compact`) and its build configuration.
+*   `boilerplate/contract-cli/`: CLI tool and deployment scripts for interacting with the contract.
+*   `boilerplate/frontend/`: The Next.js frontend application.
+*   `boilerplate/scripts/`: Helper scripts for wallet management and network interaction.
 
 ## Prerequisites
 
-- **Node.js v22** installed.
-- **Docker** installed and running (for the Midnight Proof Server).
-- **Midnight Lace Wallet** extension installed in your browser.
-- **Compact Compiler** installed globally: `npm install -g @midnight-ntwrk/compact-compiler`.
+*   Node.js v22 installed.
+*   Docker installed and running.
+*   Midnight Compact Compiler installed globally: `npm install -g @midnight-ntwrk/compact-compiler`
+*   Midnight Proof Server running locally in Docker: `docker run -p 6300:6300 midnightnetwork/proof-server`
+*   Midnight Lace Browser Extension (configured to Preprod network).
 
 ## Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/paulsayan2005/Medical-Eligibility-Verification.git
-   cd Medical-Eligibility-Verification
-   ```
+1. Clone the repository.
 2. Install root dependencies:
    ```bash
    npm install
@@ -82,87 +67,71 @@ Medical-Eligibility-Verification/
    npm install
    cd ../..
    ```
-4. Install frontend dependencies:
-   ```bash
-   cd boilerplate/frontend
-   npm install
-   cd ../..
-   ```
-5. Install CLI dependencies:
+4. Install CLI dependencies:
    ```bash
    cd boilerplate/contract-cli
    npm install
    cd ../..
    ```
-
-## Build
-
-To build the entire project (Contracts, CLI, and Frontend):
-
-```bash
-npm run build
-```
-
-Alternatively, to build individual workspaces:
-
-```bash
-npm run build -w boilerplate/contract
-npm run build -w boilerplate/contract-cli
-npm run build -w boilerplate/frontend
-```
+5. Install frontend dependencies:
+   ```bash
+   cd boilerplate/frontend
+   npm install
+   cd ../..
+   ```
 
 ## Compile
 
-To compile the Compact contract and generate the Zero-Knowledge circuits:
+Compile the Compact smart contract:
 
 ```bash
 npm run compile
 ```
 
-Make sure you have Docker running and the `midnightnetwork/proof-server` pulled:
+## Build
+
+Build the workspace packages (Contract, CLI, and Frontend):
+
 ```bash
-docker run -d -p 6300:6300 midnightnetwork/proof-server
+npm run build
 ```
 
 ## Manual Deployment
 
-Deployment is intentionally skipped. You must deploy the contract manually to the Preprod network to get the contract address.
-
-Run the following command to deploy:
+Deployment is intentionally skipped at this stage. 
+To manually deploy the contract to the Midnight Preprod network, ensure your `contract-cli` wallet has sufficient testnet funds and run:
 
 ```bash
-NODE_OPTIONS="--max-old-space-size=12288" npm run deploy:new -- --network preprod
+NODE_OPTIONS="--max-old-space-size=12288" npm run deploy -- --network preprod
 ```
-
-Wait for the deployment to finish and copy the generated contract address.
+*(Note: If using the provided workspace scripts, you may also use `npm run deploy` from the root depending on your configuration.)*
 
 ## After Deployment
 
-1. Deploy the Compact contract using the command above.
-2. Copy the deployed contract address.
-3. Replace every occurrence of `<YOUR_DEPLOYED_CONTRACT_ADDRESS>` in the codebase (including this README, frontend configuration, and environment files) with the deployed contract address.
+After you have manually deployed the contract:
+1. Copy the deployed contract address from the terminal output.
+2. Replace every occurrence of `<YOUR_DEPLOYED_CONTRACT_ADDRESS>` in this `README.md` with your actual address.
+3. Update the frontend environment variable in `boilerplate/frontend/.env` or the config file with the new address.
+4. Restart the frontend server.
 
 ## Environment Variables
 
-In `boilerplate/frontend/.env.local` (or `.env`):
+The frontend requires the following environment variables (typically stored in `.env` inside `boilerplate/frontend`):
 
-```env
-NEXT_PUBLIC_CONTRACT_ADDRESS=<YOUR_DEPLOYED_CONTRACT_ADDRESS>
-NEXT_PUBLIC_INDEXER_URL=https://indexer.preprod.midnight.network/api/v4/graphql
-NEXT_PUBLIC_NODE_URL=https://rpc.preprod.midnight.network
-NEXT_PUBLIC_PROOF_SERVER_URL=http://127.0.0.1:6300
-```
+*   `NEXT_PUBLIC_CONTRACT_ADDRESS`: The deployed contract address on the Midnight Preprod network.
+*   `NEXT_PUBLIC_INDEXER_URL`: (Optional) The Midnight Preprod Indexer URL.
+*   `NEXT_PUBLIC_NODE_URL`: (Optional) The Midnight Preprod Node URL.
 
 ## Screenshots
 
-[PLACEHOLDER_FOR_SCREENSHOTS]
+*(Placeholder for screenshots of the running dApp)*
 
 ## Initial Idea
 
-[PLACEHOLDER_FOR_INITIAL_IDEA]
+Medical Eligibility Verification
 
 ## Troubleshooting
 
-- **Compiler Error (`compactc: not found`)**: Ensure that the Compact compiler is installed. You can install it via `npm install -g @midnight-ntwrk/compact-compiler`.
-- **Proof Server Connection Refused**: Ensure Docker is running and the Midnight proof server container is actively listening on port `6300`.
-- **Wallet Connection Issues**: Ensure you have unlocked your Midnight Lace wallet and switched it to the `Preprod` network.
+*   **Wallet Initialization Errors:** Ensure your 1AM/Midnight seed phrase is correct in your configuration and that your wallet holds sufficient testnet tokens.
+*   **Sync Hangs:** If the deployment or CLI hangs while syncing, it may be downloading a large number of blocks. Allow a few minutes for the initial sync to complete.
+*   **Compilation Errors:** Verify that the `compact` compiler is installed and matches the version specified in the `package.json`.

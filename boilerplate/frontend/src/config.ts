@@ -5,7 +5,7 @@ export interface Config {
   proofServer: string;
 }
 
-export const NetworkId = 'testnet'; // or 'standalone'
+export const NetworkId = 'undeployed';
 
 export const contractConfig = {
   privateStateStoreName: 'eligibility-private-state',

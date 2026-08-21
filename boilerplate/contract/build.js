@@ -9,14 +9,18 @@ const srcDir = path.join(__dirname, 'src');
 const managedSrcDir = path.join(srcDir, 'managed');
 const managedDistDir = path.join(distDir, 'managed');
 
-// Clean dist
+// Clean dist and tsbuildinfo
 if (fs.existsSync(distDir)) {
   fs.rmSync(distDir, { recursive: true, force: true });
 }
+const buildInfo1 = path.join(__dirname, 'tsconfig.build.tsbuildinfo');
+const buildInfo2 = path.join(__dirname, 'tsconfig.tsbuildinfo');
+if (fs.existsSync(buildInfo1)) fs.rmSync(buildInfo1, { force: true });
+if (fs.existsSync(buildInfo2)) fs.rmSync(buildInfo2, { force: true });
 fs.mkdirSync(distDir, { recursive: true });
 
 // Run tsc
-execSync('tsc --project tsconfig.build.json', { cwd: __dirname, stdio: 'inherit' });
+execSync('npx tsc --project tsconfig.build.json', { cwd: __dirname, stdio: 'inherit' });
 
 // Copy managed
 if (fs.existsSync(managedSrcDir)) {

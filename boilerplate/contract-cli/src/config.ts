@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { NetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
+import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 
 export const currentDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -10,7 +10,9 @@ export const currentDir = path.dirname(fileURLToPath(import.meta.url));
  * This ensures we always reference the current compiled contract.
  */
 function detectContractPath(): string {
-  const contractSourceDir = path.resolve(currentDir, '..', '..', 'contract', 'src');
+  // Adjust for dist folder structure if running compiled code
+  const isDist = currentDir.includes('dist');
+  const contractSourceDir = path.resolve(currentDir, isDist ? '../../../..' : '../..', 'contract', 'src');
   const managedDir = path.join(contractSourceDir, 'managed');
 
   if (!fs.existsSync(contractSourceDir)) {
@@ -59,7 +61,7 @@ export class StandaloneConfig implements Config {
   node = 'http://127.0.0.1:9944';
   proofServer = 'http://127.0.0.1:6300';
   constructor() {
-    setNetworkId(NetworkId.Undeployed);
+    setNetworkId('undeployed');
   }
 }
 
@@ -77,7 +79,7 @@ export class TestnetLocalConfig implements Config {
   node = 'http://127.0.0.1:9944';
   proofServer = 'http://127.0.0.1:6300';
   constructor() {
-    setNetworkId(NetworkId.TestNet);
+    setNetworkId('testnet');
   }
 }
 
@@ -89,7 +91,7 @@ export class PreprodConfig implements Config {
   node = process.env.NODE_URL || 'https://rpc.preprod.midnight.network';
   proofServer = process.env.PROOF_SERVER_URL || 'http://127.0.0.1:6300';
   constructor() {
-    setNetworkId(NetworkId.TestNet);
+    setNetworkId('preprod');
   }
 }
 
@@ -107,6 +109,6 @@ export class TestnetRemoteConfig implements Config {
   node = 'https://rpc.testnet-02.midnight.network';
   proofServer = process.env.PROOF_SERVER_URL || 'http://127.0.0.1:6300';
   constructor() {
-    setNetworkId(NetworkId.TestNet);
+    setNetworkId('testnet');
   }
 }

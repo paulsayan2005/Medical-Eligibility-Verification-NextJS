@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import readline from 'node:readline';
 import { pino } from 'pino';
 import { createEligibilityPrivateState, hashPolicyId } from '@midnight-ntwrk/contract';
@@ -11,8 +12,10 @@ import {
   setLogger,
   verifyEligibility,
 } from './api.js';
-import { StandaloneConfig } from './config.js';
+import { PreprodConfig, StandaloneConfig } from './config.js';
 import { toHex } from '@midnight-ntwrk/midnight-js-utils';
+
+import { mnemonicToSeedSync } from 'bip39';
 
 // ============================================================
 // Medical Eligibility Verification — Interactive CLI
@@ -61,16 +64,26 @@ async function printMenu() {
 async function main() {
   await printBanner();
 
-  const config = new StandaloneConfig();
+  const config = new PreprodConfig();
 
-  console.log('🔧 Using Standalone (local) network config');
+  console.log('🔧 Using Preprod remote network config');
   console.log(`   Indexer:      ${config.indexer}`);
   console.log(`   Node:         ${config.node}`);
   console.log(`   Proof Server: ${config.proofServer}`);
   console.log('');
 
-  const seed = process.env.WALLET_SEED ?? toHex(randomBytes(32));
-  console.log(`🔑 Wallet seed: ${seed}`);
+  const rawSeed = process.env.WALLET_SEED;
+  let seed: string;
+  if (rawSeed && rawSeed.split(' ').length >= 12) {
+    seed = Buffer.from(mnemonicToSeedSync(rawSeed).slice(0, 32)).toString('hex');
+    console.log(`🔑 Using provided mnemonic seed...`);
+  } else if (rawSeed && rawSeed.length === 64) {
+    seed = rawSeed;
+    console.log(`🔑 Using provided hex seed...`);
+  } else {
+    seed = Buffer.from(randomBytes(32)).toString('hex');
+    console.log(`🔑 Using random seed... (Fund this wallet!)`);
+  }
 
   let wallet;
   try {
@@ -86,7 +99,7 @@ async function main() {
     process.exit(1);
   }
 
-  const providers = await configureProviders(wallet, config);
+  const providers = await configureProviders(seed, config);
   let contractAddress: string | null = null;
 
   while (true) {
@@ -195,13 +208,10 @@ async function main() {
         }
         break;
       }
-
       case '5':
         console.log('\n  👋 Goodbye!\n');
         rl.close();
-        await wallet.close();
         process.exit(0);
-        break;
 
       default:
         console.log('\n  ⚠️  Invalid choice. Enter 1-5.');
