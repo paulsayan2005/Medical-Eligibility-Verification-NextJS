@@ -1,181 +1,176 @@
-# Medical Eligibility Verification — Midnight Network dApp
+# 🛡️ Medical Eligibility Verification
 
-> A privacy-first medical eligibility dApp built on the [Midnight Network](https://midnight.network), using **Zero-Knowledge Proofs** to verify patient eligibility without exposing sensitive medical data.
+Enterprise Zero-Knowledge Medical Eligibility Verification built natively on the Midnight Network using Compact smart contracts, client-side ZK-SNARK proving, dual-state ledger privacy, and Next.js.
 
----
+## 🔗 Links
+
+[![Live Video](https://img.shields.io/badge/YouTube-Live_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FJ9CQxYjNU)
+[![Live Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://medical-eligibility-verification-next-b7hew5odh-sayan-paul.vercel.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/paulsayan2005/Medical-Eligibility-Verification-NextJS)
 
 ## 📸 Application Screenshots
 
-### 🏠 Landing Page
-![Landing Page](docs/screenshots/landing.png)
+| Screen | Description |
+| :--- | :--- |
+| **[Landing Page](docs/screenshots/landing.png)** | Hero section showcasing medical privacy, connected Midnight wallet, live Preprod network badge, and interactive eligibility exploration. |
+| **[System Status](docs/screenshots/SystemStatus.png)** | Real-time technical control panel, wallet connection status, live Preprod blockchain state, and verification status monitoring. |
+| **[Verify Eligibility](docs/screenshots/Verify.png)** | Private witness execution, client-side secret evaluation for Patient Age and Policy ID Hash, and medical eligibility verification portal. |
 
-The home page introduces the dApp with a clear call-to-action to connect your 1AM wallet and begin a verification session.
+## 🧠 Executive Summary & Problem Statement
 
----
+### The Problem
+Traditional medical eligibility systems suffer from critical privacy flaws:
+*   **Raw PII Exposure:** Patients are forced to present personal identifiers (names, exact ages, SSNs, policy IDs) to prove eligibility, creating massive identity leakage.
+*   **On-Chain Surveillance:** In standard blockchain dApps, signing a transaction permanently links a public wallet address to physical medical history and timestamps on an immutable public ledger.
+*   **Data Breach Vulnerabilities:** Centralized medical databases represent lucrative honeypots for credential harvesting and HIPAA violations.
 
-### 🔬 Verify Eligibility Page
-![Verify Eligibility Page](docs/screenshots/Verify.png)
+### The Solution
+Medical Eligibility Verification enables patients to mathematically prove their medical qualifications in Zero-Knowledge.
+*   No exact ages, names, or credentials ever leave the patient's local device.
+*   No wallet identities or personal identifiable information (PII) are published on-chain.
+*   The Midnight ledger verifies the cryptographic proof, increments the aggregate eligibility counters, and records the verification state without compromising patient confidentiality.
 
-Patients enter their **age** and **Policy ID hash** locally. A Zero-Knowledge proof is generated entirely in the browser — the raw values are **never sent to the network**. The page shows live progress steps: circuit preparation → proof generation → wallet signature → transaction submission → confirmation.
+## ⚙️ Working Principles & Cryptographic Flow
 
----
+The platform leverages Midnight's dual-state architecture where private witness execution is strictly isolated on the client side, and only succinct ZK-SNARK proofs cross the network boundary:
 
-### ⚙️ System Status Page
-![System Status Page](docs/screenshots/SystemStatus.png)
-
-A real-time technical dashboard showing:
-- **Web3 Wallet**: 1AM wallet connection status and truncated address
-- **Midnight Network**: Network ID and node sync status
-- **Compact Contract**: On-chain contract address (or `NOT CONFIGURED` if not deployed)
-- **Zero-Knowledge Proofs**: Local WASM prover and ZSwap availability
-
----
-
-## 💡 Product Proposal
-
-**Category**: Private Allowlist Access
-
-A medical eligibility system where a patient can prove they meet a minimum age requirement and hold a valid policy ID **without** revealing their actual age or policy ID on the public ledger. This is achieved using Zero-Knowledge proofs — the patient's sensitive data remains fully private (witnesses), while the verification outcome is recorded transparently on-chain.
-
----
-
-## 📁 Project Structure
-
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ PATIENT'S LOCAL CLIENT                                                      │
+│                                                                             │
+│               [ Patient Age ] + [ Policy ID Hash ]                          │
+│                                 ▼                                           │
+│       (Private witness execution strictly inside browser/WASM)              │
+│                                                                             │
+│        ┌──────────────────────────────────────────────┐                     │
+│        │          Midnight Compact Circuit            │                     │
+│        │                                              │                     │
+│        │ - secret evaluation against minAge           │ ← Midnight Prover   │
+│        │ - verifyEligibility() constraint evaluation  │                     │
+│        └──────────────────────┬───────────────────────┘                     │
+│                               │                                             │
+│                               ▼                                             │
+│                     (ZK-SNARK Proof only)                                   │
+└───────────────────────────────┼─────────────────────────────────────────────┘
+                                ▼
+         (Network Boundary: ZERO MEDICAL PII Transmitted)
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ MIDNIGHT PREPROD LEDGER                                                     │
+│                                                                             │
+│ PUBLIC ON-CHAIN STATE:                                                      │
+│ ✅ verificationCount — Aggregate verification counter incremented (+1)      │
+│ ✅ eligibleCount — Aggregate eligible counter incremented                   │
+│ ✅ ineligibleCount — Aggregate ineligible counter incremented               │
+│                                                                             │
+│ PROTECTED PRIVATE STATE (Never exposed or stored on-chain):                 │
+│ ❌ patientAge — Exact age of the patient                                    │
+│ ❌ policyIdHash — The exact policy identifier                               │
+│ ❌ patientWalletId — Personal wallet address correlating to the patient     │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
-Medical-Eligibility-Verification-NextJS/
-├── src/                        # Next.js 14 App Router frontend
-│   ├── app/
-│   │   ├── page.tsx            # Landing page
-│   │   ├── verify/page.tsx     # Verify Eligibility page
-│   │   ├── system/page.tsx     # System Status page
-│   │   └── layout.tsx          # Root layout with WalletProvider
-│   ├── components/
-│   │   ├── Navbar.tsx          # Navigation + wallet connection button
-│   │   └── WalletProvider.tsx  # 1AM DApp Connector context
-│   └── lib/midnight/           # Midnight SDK integration layer
-├── contract/                   # Compact smart contract
-│   └── src/
-│       └── medical-eligibility-verification.compact
-├── contract-cli/               # Node.js CLI for testing + deployment
-├── scripts/                    # Deploy, faucet, balance scripts
-├── docs/screenshots/           # App screenshots
-└── .github/workflows/ci.yml    # GitHub Actions CI
-```
 
----
+## 🛡️ Midnight Privacy Model Breakdown
 
-## 🛠️ Prerequisites
+| Parameter | Visibility | Storage Location | Cryptographic Guarantee |
+| :--- | :--- | :--- | :--- |
+| **Patient Age** | 🔒 Private | Client RAM only | Never serialized over network; evaluated in ZK witness |
+| **Policy ID Hash** | 🔒 Private | Ephemeral | Used locally to ensure valid policy, never revealed on ledger |
+| **Patient Identity** | 🔒 Private | Off-Chain | Zero wallet-to-patient correlation on public ledger |
+| **Verification Counters** | 🌐 Public | Midnight Ledger | Aggregate counters tracking overall system usage (eligible/ineligible) |
+| **Boolean Outcome** | 🌐 Public | Midnight Ledger | Only the mathematical result (true/false) is exposed |
 
-- **Node.js 20+**
-- **WSL (Ubuntu)** — recommended on Windows for Compact compiler compatibility
-- **1AM Wallet** browser extension ([Download](https://midnight.network/wallet))
-- **Midnight Compact Compiler** `v0.31.1` installed at:  
-  `~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin`
+## 📖 Step-by-Step Developer & Operator Guide
 
----
+### 1. System Requirements & Prerequisites
+*   **Node.js**: v20.x (LTS recommended)
+*   **Browser Extension**: [1AM Wallet](https://midnight.network/wallet) or [Midnight Lace](https://midnight.network/get-lace)
+*   **Midnight Compiler**: `compactc` v0.31.1 (WSL/Ubuntu highly recommended for Windows)
 
-## 🚀 Setup & Development
-
-### 1. Install Dependencies
+### 2. Installation & Setup
 
 ```bash
+# Clone repository
+git clone https://github.com/paulsayan2005/Medical-Eligibility-Verification-NextJS.git
+cd Medical-Eligibility-Verification-NextJS
+
+# Install dependencies
 npm install
 ```
 
-### 2. Run the Development Server
+### 3. Compile the Compact Contract
+
+```bash
+npm run compile
+npm run build -w contract
+```
+
+### 4. Fund Testnet Wallet
+Get testnet tDUST tokens from the official Faucet:
+*   **Faucet URL**: [https://faucet.midnight.network/](https://faucet.midnight.network/)
+*   **Required**: tDUST to pay transaction fees. 
+
+### 5. Launch the Web Application
 
 ```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000/).
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+### 6. Connect Wallet (1AM Wallet & Lace)
+*   Click the "Connect 1AM Wallet" button in the top navigation bar.
+*   The platform automatically scans `window.midnight` using the new SDK v5 and EIP-6963 style `.connect()` specification.
+*   Approve the authorization prompt in your wallet extension.
 
-### 3. Connect the 1AM Wallet
-
-Click **"Connect 1AM Wallet"** in the top-right corner. Your installed 1AM extension will show a connection popup. Once approved, your truncated wallet address will appear in the navbar.
-
----
-
-## 📦 Smart Contract
-
-### Compile the Contract
-
+### 7. Deploying Contracts to Midnight Preprod
+Deployment requires tDUST. Once funded, you can deploy the contract manually:
 ```bash
-npm run compile
+npm run deploy
+```
+Once deployed, create a `.env` file in the root directory:
+```env
+NEXT_PUBLIC_CONTRACT_ADDRESS=<YOUR_DEPLOYED_CONTRACT_ADDRESS>
 ```
 
-This runs the Compact compiler to generate ZK circuit artifacts and TypeScript bindings into `contract/src/managed/`.
+## ✅ Feature & Compliance Checklist
 
-### Build the Contract
+### Smart Contracts & ZK Circuits
+- [x] Written in Midnight Compact Language (`contract/src/medical-eligibility-verification.compact`)
+- [x] Private witness computation for medical credentials (age, policy hash)
+- [x] Public state transitions for aggregate counters
+- [x] Zero PII exposure on public ledger state
 
-```bash
-npm run build -w contract
+### DApp & Wallet Connector
+- [x] Built with Next.js App Router and native TypeScript
+- [x] Full compliance with official Midnight SDK v5 API
+- [x] Native support for 1AM Wallet and Midnight Lace via DApp connector
+- [x] Fallback mechanisms for legacy API connections
+- [x] Premium Glassmorphism UI built with Tailwind CSS
+
+## 🏛️ Real-World Sector Use Cases
+
+| Sector | Practical Application |
+| :--- | :--- |
+| **Health Insurance** | Verify patient coverage levels at clinics without sharing full medical history. |
+| **Pharmaceutical Trials** | Screen trial participants for age/condition criteria with mathematical privacy guarantees. |
+| **Age-Restricted Products** | Prove age (21+) for medical dispensaries without exposing physical IDs or birthdates. |
+| **Telehealth Access** | HIPAA and GDPR-compliant virtual waiting rooms where identity exposure violates patient confidentiality. |
+
+## 🛠️ Monorepo Structure
+
+```text
+Medical-Eligibility-Verification-NextJS/
+├── contract/                   # Compact ZK smart contracts
+│   └── src/
+│       └── medical-eligibility-verification.compact
+├── contract-cli/               # Node.js CLI for testing + deployment
+├── src/                        # Next.js App Router frontend
+│   ├── app/                    # UI Pages (Landing, Verify, System)
+│   ├── components/             # Reusable UI components (Navbar, WalletProvider)
+│   └── lib/midnight/           # ZK utilities and Midnight provider logic
+├── scripts/                    # Deployment scripts
+├── docs/screenshots/           # Application screenshots
+└── README.md                   # Primary documentation & user guide
 ```
 
-Compiles TypeScript to `contract/dist/`.
-
----
-
-## 🚢 Deploying to Midnight Testnet (Preprod)
-
-Deployment requires **tDUST** tokens.
-
-1. **Get your wallet address** from the System page after connecting your 1AM wallet.
-2. **Request tDUST** from the [Midnight Faucet](https://faucet.midnight.network) using your address.
-3. **Deploy the contract**:
-   ```bash
-   npm run deploy
-   ```
-4. Copy the deployed contract address into your `.env` file:
-   ```
-   NEXT_PUBLIC_CONTRACT_ADDRESS=<deployed-address>
-   ```
-
----
-
-## 🔐 Architecture & Privacy Model
-
-| Data | Visibility |
-|---|---|
-| `verificationCount` | 🌐 Public on-chain |
-| `eligibleCount` | 🌐 Public on-chain |
-| `ineligibleCount` | 🌐 Public on-chain |
-| `patientAge` | 🔒 Private — stays in browser only |
-| `policyIdHash` | 🔒 Private — stays in browser only |
-
-When a patient verifies eligibility:
-1. A ZK proof is generated **locally in the browser** proving `age >= minAge` and `policyHash != emptyHash`
-2. Only the **boolean outcome** is disclosed to the public network
-3. Public counters (`eligibleCount` / `ineligibleCount`) are incremented
-4. The raw age and policy ID **never leave the patient's device**
-
----
-
-## ✅ Hackathon Submission Checklist
-
-### Level 1 — New Moon 🌑
-- [x] Compact toolchain documented (`0.31.1` via WSL/Ubuntu)
-- [x] Meaningful contract (not hello-world)
-- [x] Public ledger state + private witness behavior
-- [x] `disclose()` used only for intentionally public values (boolean result)
-- [x] Contract compiles with generated `managed/` artifacts
-- [x] Local deploy instructions documented
-- [x] Minimum 5 meaningful commits
-
-### Level 2 — Waxing Crescent 🌒
-- [x] Frontend exists, builds (`npm run build`) and runs (`npm run dev`)
-- [x] 1AM wallet connect/disconnect UI with visible connection status
-- [x] Network and contract address configurable via `.env`
-- [x] UI calls the Zero-Knowledge verify circuit
-- [x] UI handles loading, success, and error states
-- [x] System status panel with live network information
-- [x] Minimum 8 meaningful commits
-
-### Level 3 — First Quarter 🌓
-- [x] Maps to official category: **Private Allowlist Access**
-- [x] CI workflow (`.github/workflows/ci.yml`) runs build validation
-- [x] README has a Privacy Model section
-- [x] README has a Product Proposal section
-- [x] README has Level 1/2/3 submission checklist
-- [x] Frontend polished for demo
-- [x] Minimum 10 meaningful commits
+## 📄 License
+This project is open-source and distributed under the MIT License.
