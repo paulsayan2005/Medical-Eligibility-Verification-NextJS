@@ -15,9 +15,9 @@ Enterprise Zero-Knowledge Medical Eligibility Verification built natively on the
 
 | Screen | Description |
 | :--- | :--- |
-| **[Landing Page](docs/screenshots/landing.png)** | Hero section showcasing medical privacy, connected Midnight wallet, live Preprod network badge, and interactive eligibility exploration. |
-| **[System Status](docs/screenshots/SystemStatus.png)** | Real-time technical control panel, wallet connection status, live Preprod blockchain state, and verification status monitoring. |
-| **[Verify Eligibility](docs/screenshots/Verify.png)** | Private witness execution, client-side secret evaluation for Patient Age and Policy ID Hash, and medical eligibility verification portal. |
+| ![Landing Page](docs/screenshots/landing.png) | Hero section showcasing medical privacy, connected Midnight wallet, live Preprod network badge, and interactive eligibility exploration. |
+| ![System Status](docs/screenshots/SystemStatus.png) | Real-time technical control panel, wallet connection status, live Preprod blockchain state, and verification status monitoring. |
+| ![Verify Eligibility](docs/screenshots/Verify.png) | Private witness execution, client-side secret evaluation for Patient Age and Policy ID Hash, and medical eligibility verification portal. |
 
 ## 🧠 Executive Summary & Problem Statement
 
