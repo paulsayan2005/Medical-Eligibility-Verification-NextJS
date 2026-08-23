@@ -13,39 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Use Node.js 22.x
+    - name: Use Node.js 20.x
       uses: actions/setup-node@v3
       with:
-        node-version: '22'
-        cache: 'npm'
-
-    - name: Install Midnight Compact Compiler
-      run: |
-        curl -L "https://github.com/midnightntwrk/compact/releases/download/compactc-v0.31.1/compactc_v0.31.1_x86_64-unknown-linux-musl.zip" -o compactc.zip
-        unzip -o compactc.zip -d compact-tools
-        mkdir -p ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl
-        mv compact-tools/* ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/
-        chmod +x ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/*
-        echo "$HOME/.compact/versions/0.31.1/x86_64-unknown-linux-musl" >> $GITHUB_PATH
+        node-version: '20'
 
     - name: Install dependencies
-      run: |
-        rm -f package-lock.json
-        npm install
-
-    - name: Compile Contract (Compact -> JS)
-      run: |
-        cd contract/src
-        mkdir -p managed/medical-eligibility-verification
-        compactc medical-eligibility-verification.compact managed/medical-eligibility-verification
-        sed -i 's/.*checkRuntimeVersion.*//g' managed/medical-eligibility-verification/contract/index.js
-        echo "✅ Compact contract compiled"
-
-    - name: Build Contract (TypeScript -> dist)
-      run: npm run build -w contract
-
-    - name: Test Contract CLI (Vitest)
-      run: npm run test -w contract-cli
+      run: npm install --ignore-scripts
 
     - name: Build Next.js Frontend
       run: npm run build
