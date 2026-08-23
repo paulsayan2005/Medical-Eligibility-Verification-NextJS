@@ -1,120 +1,181 @@
-# Medical Eligibility Verification (Midnight Network dApp)
+# Medical Eligibility Verification — Midnight Network dApp
 
-![Landing Page](boilerplate/frontend/public/landing.png)
-![App Dashboard](boilerplate/frontend/public/app.png)
+> A privacy-first medical eligibility dApp built on the [Midnight Network](https://midnight.network), using **Zero-Knowledge Proofs** to verify patient eligibility without exposing sensitive medical data.
 
-This project is a full-stack Midnight Network decentralized application that implements **Private Allowlist Access / Confidential Credentials** for Medical Eligibility Verification.
+---
 
-## Product Proposal
+## 📸 Application Screenshots
+
+### 🏠 Landing Page
+![Landing Page](docs/screenshots/landing.png)
+
+The home page introduces the dApp with a clear call-to-action to connect your 1AM wallet and begin a verification session.
+
+---
+
+### 🔬 Verify Eligibility Page
+![Verify Eligibility Page](docs/screenshots/Verify.png)
+
+Patients enter their **age** and **Policy ID hash** locally. A Zero-Knowledge proof is generated entirely in the browser — the raw values are **never sent to the network**. The page shows live progress steps: circuit preparation → proof generation → wallet signature → transaction submission → confirmation.
+
+---
+
+### ⚙️ System Status Page
+![System Status Page](docs/screenshots/SystemStatus.png)
+
+A real-time technical dashboard showing:
+- **Web3 Wallet**: 1AM wallet connection status and truncated address
+- **Midnight Network**: Network ID and node sync status
+- **Compact Contract**: On-chain contract address (or `NOT CONFIGURED` if not deployed)
+- **Zero-Knowledge Proofs**: Local WASM prover and ZSwap availability
+
+---
+
+## 💡 Product Proposal
 
 **Category**: Private Allowlist Access
-**Idea**: A medical eligibility system where a patient can prove they meet a minimum age requirement and hold a valid policy ID **without** revealing their actual age or policy ID on the public ledger. This is achieved utilizing Zero-Knowledge proofs where the patient's sensitive data remains fully private (witnesses), while the verification outcome is recorded transparently on-chain.
 
-## Project Structure
+A medical eligibility system where a patient can prove they meet a minimum age requirement and hold a valid policy ID **without** revealing their actual age or policy ID on the public ledger. This is achieved using Zero-Knowledge proofs — the patient's sensitive data remains fully private (witnesses), while the verification outcome is recorded transparently on-chain.
 
-- `boilerplate/contract`: The Compact smart contract logic and witnesses.
-- `boilerplate/contract-cli`: Interactive Node.js CLI tool for testing deployment and verification.
-- `boilerplate/frontend`: A Vite + React + TS frontend integrating with the Lace wallet to interact with the contract.
+---
 
-## Prerequisites
+## 📁 Project Structure
 
-- **WSL (Ubuntu)** is highly recommended on Windows for Midnight development to avoid filesystem permission issues with the Compact compiler.
-- Node.js 22+
-- Midnight Compact Compiler (`0.31.1`) installed in `~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin`
-
-## Setup & Compilation
-
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
-
-2. **Compile the Contract**:
-   This compiles the `.compact` file to a ZK circuit and generates the TypeScript bindings.
-   ```bash
-   npm run build -w boilerplate/contract
-   ```
-
-## Running the Tests & CLI
-
-The CLI contains a full interactive flow to Deploy, Join, Verify, and Query the ledger state. It also contains Vitest tests.
-
-```bash
-npm run test -w boilerplate/contract-cli
+```
+Medical-Eligibility-Verification-NextJS/
+├── src/                        # Next.js 14 App Router frontend
+│   ├── app/
+│   │   ├── page.tsx            # Landing page
+│   │   ├── verify/page.tsx     # Verify Eligibility page
+│   │   ├── system/page.tsx     # System Status page
+│   │   └── layout.tsx          # Root layout with WalletProvider
+│   ├── components/
+│   │   ├── Navbar.tsx          # Navigation + wallet connection button
+│   │   └── WalletProvider.tsx  # 1AM DApp Connector context
+│   └── lib/midnight/           # Midnight SDK integration layer
+├── contract/                   # Compact smart contract
+│   └── src/
+│       └── medical-eligibility-verification.compact
+├── contract-cli/               # Node.js CLI for testing + deployment
+├── scripts/                    # Deploy, faucet, balance scripts
+├── docs/screenshots/           # App screenshots
+└── .github/workflows/ci.yml    # GitHub Actions CI
 ```
 
-To run the interactive CLI:
+---
+
+## 🛠️ Prerequisites
+
+- **Node.js 20+**
+- **WSL (Ubuntu)** — recommended on Windows for Compact compiler compatibility
+- **1AM Wallet** browser extension ([Download](https://midnight.network/wallet))
+- **Midnight Compact Compiler** `v0.31.1` installed at:  
+  `~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin`
+
+---
+
+## 🚀 Setup & Development
+
+### 1. Install Dependencies
+
 ```bash
-npm start -w boilerplate/contract-cli
+npm install
 ```
 
-## Preprod Deployment
-
-A script has been added to deploy the contract directly to the Preprod network.
-
-1. The script will generate a new wallet and wait for funds. 
-2. **Note on Funding**: The Midnight Faucet *only* accepts **Transparent** addresses. The CLI generates a **Shielded** address (`mn_shield-addr_...`).
-   - Open your Lace wallet extension and go to the "Receive" tab.
-   - Copy your Lace **Transparent Address** and paste it into the [Midnight Faucet](https://faucet.preview.midnight.network) to get tNight.
-   - Once received in Lace, go to "Send", and send the test tokens to the CLI's Shielded Address that was printed in your terminal.
-3. Once the shielded CLI wallet receives the tokens, the script will automatically continue and deploy the contract.
-4. The generated seed is automatically saved to `.env`.
-3. Run the deployment script:
-```bash
-npm run build -w boilerplate/contract-cli
-node boilerplate/contract-cli/dist/deploy-preprod.js
-```
-
-## Running the Frontend
-
-The React frontend uses the `dapp-connector-api` to connect to the Lace wallet extension.
+### 2. Run the Development Server
 
 ```bash
-cd boilerplate/frontend
 npm run dev
 ```
 
-Open your browser to the local Vite URL. Connect your Lace wallet, deploy a new Eligibility contract, or join an existing one to perform Zero-Knowledge verifications.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Architecture & Privacy Model
+### 3. Connect the 1AM Wallet
 
-- **Public Ledger State**: `verificationCount`, `eligibleCount`, `ineligibleCount`.
-- **Private State (Witnesses)**: `secretPatientAge`, `secretPolicyIdHash`.
+Click **"Connect 1AM Wallet"** in the top-right corner. Your installed 1AM extension will show a connection popup. Once approved, your truncated wallet address will appear in the navbar.
 
-When a patient verifies eligibility, a Zero-Knowledge proof is generated locally in the browser/CLI, proving `age >= minAge` and `policyHash != emptyHash`. Only the boolean outcome is disclosed to the public network, incrementing the public counters.
+---
 
-## Known Limitations / Notes
+## 📦 Smart Contract
 
-- **Dynamic Imports in Tests**: Node/Vitest has issues with dynamic module resolution for generated contract JS bundles. Static imports and a `sed` patch removing `checkRuntimeVersion` are implemented in the build step to ensure tests run smoothly.
-- **Vite 8 + Rolldown + Midnight WASM**: `@midnight-ntwrk/compact-runtime` uses CJS `require()` to load WASM with top-level await. Rolldown (Vite 8's bundler) does not support this combination. The fix is to externalize `@midnight-ntwrk/compact-runtime` and `@midnight-ntwrk/onchain-runtime` from the Vite bundle (`rollupOptions.external`). They are still available at runtime via the Midnight SDK's own WASM loader.
-- **Frontend Build Status**: `npm run build -w boilerplate/frontend` succeeds and produces a production-ready `dist/` bundle with WASM assets (`zswap`, `ledger`) correctly emitted.
+### Compile the Contract
 
-## Hackathon Submission Checklist
+```bash
+npm run compile
+```
 
-### Level 1 - New Moon 🌑
-- [x] Compact toolchain assumptions documented (`0.31.1` via WSL/Ubuntu).
-- [x] Meaningful Contract exists (not hello-world).
-- [x] Contract has public ledger state and private input/witness behavior.
-- [x] `disclose()` used only for intentionally public values (boolean result).
-- [x] Contract compiles correctly with generated `managed/` artifacts.
-- [x] Local deploy instructions work and are documented.
-- [x] Minimum 5 meaningful commits.
+This runs the Compact compiler to generate ZK circuit artifacts and TypeScript bindings into `contract/src/managed/`.
 
-### Level 2 - Waxing Crescent 🌒
-- [x] Frontend exists, builds (`npm run build`), and runs (`npm run dev`).
-- [x] Lace wallet connect/disconnect UI exists with connection status visible.
-- [x] Network and contract address are configurable via `.env` files.
-- [x] UI is wired to call the Zero-Knowledge verify circuit.
-- [x] UI handles loading, success, and error states gracefully (glassmorphism UI).
-- [x] Public event state panel exists and live-updates from the ledger.
-- [x] Minimum 8 meaningful commits.
+### Build the Contract
 
-### Level 3 - First Quarter 🌓
-- [x] Project maps to official category: **Private Allowlist Access**.
-- [x] At least 3 meaningful tests exist in Vitest (23 tests pass).
-- [x] CI workflow exists (`.github/workflows/ci.yml`) and runs compile/test/type-check/build.
-- [x] README has a Privacy Model section explaining what observers can/cannot learn.
-- [x] README has a Product Proposal section.
-- [x] README has a Level 1/2/3 submission checklist.
-- [x] Frontend is polished for demo (Premium Glassmorphism Design).
-- [x] Minimum 10 meaningful commits.
+```bash
+npm run build -w contract
+```
+
+Compiles TypeScript to `contract/dist/`.
+
+---
+
+## 🚢 Deploying to Midnight Testnet (Preprod)
+
+Deployment requires **tDUST** tokens.
+
+1. **Get your wallet address** from the System page after connecting your 1AM wallet.
+2. **Request tDUST** from the [Midnight Faucet](https://faucet.midnight.network) using your address.
+3. **Deploy the contract**:
+   ```bash
+   npm run deploy
+   ```
+4. Copy the deployed contract address into your `.env` file:
+   ```
+   NEXT_PUBLIC_CONTRACT_ADDRESS=<deployed-address>
+   ```
+
+---
+
+## 🔐 Architecture & Privacy Model
+
+| Data | Visibility |
+|---|---|
+| `verificationCount` | 🌐 Public on-chain |
+| `eligibleCount` | 🌐 Public on-chain |
+| `ineligibleCount` | 🌐 Public on-chain |
+| `patientAge` | 🔒 Private — stays in browser only |
+| `policyIdHash` | 🔒 Private — stays in browser only |
+
+When a patient verifies eligibility:
+1. A ZK proof is generated **locally in the browser** proving `age >= minAge` and `policyHash != emptyHash`
+2. Only the **boolean outcome** is disclosed to the public network
+3. Public counters (`eligibleCount` / `ineligibleCount`) are incremented
+4. The raw age and policy ID **never leave the patient's device**
+
+---
+
+## ✅ Hackathon Submission Checklist
+
+### Level 1 — New Moon 🌑
+- [x] Compact toolchain documented (`0.31.1` via WSL/Ubuntu)
+- [x] Meaningful contract (not hello-world)
+- [x] Public ledger state + private witness behavior
+- [x] `disclose()` used only for intentionally public values (boolean result)
+- [x] Contract compiles with generated `managed/` artifacts
+- [x] Local deploy instructions documented
+- [x] Minimum 5 meaningful commits
+
+### Level 2 — Waxing Crescent 🌒
+- [x] Frontend exists, builds (`npm run build`) and runs (`npm run dev`)
+- [x] 1AM wallet connect/disconnect UI with visible connection status
+- [x] Network and contract address configurable via `.env`
+- [x] UI calls the Zero-Knowledge verify circuit
+- [x] UI handles loading, success, and error states
+- [x] System status panel with live network information
+- [x] Minimum 8 meaningful commits
+
+### Level 3 — First Quarter 🌓
+- [x] Maps to official category: **Private Allowlist Access**
+- [x] CI workflow (`.github/workflows/ci.yml`) runs build validation
+- [x] README has a Privacy Model section
+- [x] README has a Product Proposal section
+- [x] README has Level 1/2/3 submission checklist
+- [x] Frontend polished for demo
+- [x] Minimum 10 meaningful commits
