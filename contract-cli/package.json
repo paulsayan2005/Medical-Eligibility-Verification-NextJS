@@ -17,7 +17,7 @@
     "start-testnet-remote": "npm run build && npm run testnet-remote"
   },
   "dependencies": {
-    "@midnight-ntwrk/contract": "file:../contract",
+    "@midnight-ntwrk/contract": "*",
     "dotenv": "^16.5.0"
   }
 }

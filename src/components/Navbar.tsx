@@ -47,7 +47,9 @@ export default function Navbar() {
               {isConnected ? (
                 <div className="flex items-center gap-4">
                   <span className="hidden sm:inline-block text-xs font-mono bg-accent text-accent-foreground px-3 py-1 rounded-full">
-                    {address?.slice(0, 12)}...{address?.slice(-4)}
+                    {typeof address === 'string' 
+                      ? `${address.slice(0, 12)}...${address.slice(-4)}`
+                      : 'Connected'}
                   </span>
                   <button
                     onClick={disconnect}
