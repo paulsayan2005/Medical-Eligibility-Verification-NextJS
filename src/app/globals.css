@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  
+  --primary: #0ea5e9;
+  --primary-foreground: #ffffff;
+  
+  --secondary: #38bdf8;
+  --secondary-foreground: #ffffff;
+  
+  --accent: #e0f2fe;
+  --accent-foreground: #0369a1;
+
+  --success: #10b981;
+  --error: #ef4444;
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --border: #e2e8f0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --foreground: #f8fafc;
+    
+    --primary: #0284c7;
+    --primary-foreground: #ffffff;
+    
+    --secondary: #0369a1;
+    --secondary-foreground: #ffffff;
+    
+    --accent: #0f172a;
+    --accent-foreground: #e0f2fe;
+    
+    --success: #059669;
+    --error: #dc2626;
+
+    --card: rgba(15, 23, 42, 0.6);
+    --card-foreground: #f8fafc;
+    
+    --border: rgba(51, 65, 85, 0.5);
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.glass-card {
+  @apply rounded-xl p-6 glass-panel transition-all duration-200 hover:shadow-lg;
+}
+
+/* Base interactive elements */
+.btn-primary {
+  @apply px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  @apply px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center justify-center gap-2;
+  background-color: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+.btn-secondary:hover {
+  background-color: var(--accent);
+}
+
+.input-field {
+  @apply w-full px-4 py-3 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary transition-all bg-transparent;
+  border-color: var(--border);
+}

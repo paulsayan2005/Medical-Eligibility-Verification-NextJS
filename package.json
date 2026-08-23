@@ -5,40 +5,27 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "boilerplate/contract",
-    "boilerplate/contract-cli",
-    "boilerplate/scripts",
-    "boilerplate/frontend"
+    "contract",
+    "contract-cli"
   ],
   "scripts": {
-    "compile": "cd boilerplate/contract/src && rm -rf managed/medical-eligibility-verification && mkdir -p managed/medical-eligibility-verification && ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin medical-eligibility-verification.compact managed/medical-eligibility-verification && sed -i 's/.*checkRuntimeVersion.*//g' managed/medical-eligibility-verification/contract/index.js && echo '✅ Contract compiled' && cd ../../.. && npm run build -w boilerplate/contract",
-    "dev": "npm run dev -w boilerplate/frontend",
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
-    "cli": "npm run cli -w boilerplate/contract-cli",
-    "wallet": "node boilerplate/scripts/generate-key.js",
-    "faucet": "node boilerplate/scripts/request-faucet.js",
-    "balance": "node boilerplate/scripts/check-balance.js",
-    "deploy": "node boilerplate/scripts/deploy.js --new",
-    "deploy:new": "node boilerplate/scripts/deploy.js --new",
-    "deploy:join": "node boilerplate/scripts/deploy.js --join",
-    "check": "node -e \"console.log('✅ Medical Eligibility Verification dApp ready!'); console.log('💡 Run: npm run compile && npm run cli'); process.exit(0)\""
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.28.0",
-    "@types/node": "^22.15.29",
-    "@types/ws": "^8.18.1",
-    "@typescript-eslint/eslint-plugin": "^8.33.1",
-    "@typescript-eslint/parser": "^8.33.1",
-    "eslint": "^9.28.0",
-    "eslint-config-prettier": "^10.1.5",
-    "eslint-plugin-prettier": "^5.4.1",
-    "testcontainers": "^11.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.0"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "compile": "cd contract/src && rm -rf managed/medical-eligibility-verification && mkdir -p managed/medical-eligibility-verification && ~/.compact/versions/0.31.1/x86_64-unknown-linux-musl/compactc.bin medical-eligibility-verification.compact managed/medical-eligibility-verification && sed -i 's/.*checkRuntimeVersion.*//g' managed/medical-eligibility-verification/contract/index.js && echo '\\u2705 Contract compiled'",
+    "test": "npm run test -w contract-cli",
+    "cli": "npm run cli -w contract-cli",
+    "wallet": "node scripts/generate-key.js",
+    "faucet": "node scripts/request-faucet.js",
+    "balance": "node scripts/check-balance.js",
+    "deploy": "node scripts/deploy.js --new"
   },
   "dependencies": {
+    "react": "^18",
+    "react-dom": "^18",
+    "next": "14.2.33",
+    "lucide-react": "^0.370.0",
     "@midnight-ntwrk/compact-runtime": "^0.8.1",
     "@midnight-ntwrk/ledger": "^4.0.0",
     "@midnight-ntwrk/midnight-js-contracts": "2.0.1",
@@ -55,6 +42,25 @@
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
     "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.33",
+    "@eslint/js": "^9.28.0",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.33.1",
+    "@typescript-eslint/parser": "^8.33.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "testcontainers": "^11.0.0",
+    "ts-node": "^10.9.2",
+    "vitest": "^3.2.0"
   },
   "overrides": {
     "vite": "^8.0.0"

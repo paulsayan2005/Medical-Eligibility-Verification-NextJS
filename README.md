@@ -48,6 +48,23 @@ To run the interactive CLI:
 npm start -w boilerplate/contract-cli
 ```
 
+## Preprod Deployment
+
+A script has been added to deploy the contract directly to the Preprod network.
+
+1. The script will generate a new wallet and wait for funds. 
+2. **Note on Funding**: The Midnight Faucet *only* accepts **Transparent** addresses. The CLI generates a **Shielded** address (`mn_shield-addr_...`).
+   - Open your Lace wallet extension and go to the "Receive" tab.
+   - Copy your Lace **Transparent Address** and paste it into the [Midnight Faucet](https://faucet.preview.midnight.network) to get tNight.
+   - Once received in Lace, go to "Send", and send the test tokens to the CLI's Shielded Address that was printed in your terminal.
+3. Once the shielded CLI wallet receives the tokens, the script will automatically continue and deploy the contract.
+4. The generated seed is automatically saved to `.env`.
+3. Run the deployment script:
+```bash
+npm run build -w boilerplate/contract-cli
+node boilerplate/contract-cli/dist/deploy-preprod.js
+```
+
 ## Running the Frontend
 
 The React frontend uses the `dapp-connector-api` to connect to the Lace wallet extension.

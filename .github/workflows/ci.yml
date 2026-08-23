@@ -29,19 +29,13 @@ jobs:
         echo "$HOME/.compact/versions/0.31.1/x86_64-unknown-linux-musl" >> $GITHUB_PATH
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Compile Contract
-      run: |
-        mkdir -p boilerplate/contract/src/managed
-        npm run compact -w boilerplate/contract
-        npm run build -w boilerplate/contract
+      run: npm run compile
 
     - name: Test Contract CLI (Vitest)
-      run: npm run test -w boilerplate/contract-cli
+      run: npm run test
 
-    - name: Type-check CLI
-      run: npm run typecheck -w boilerplate/contract-cli
-
-    - name: Build Frontend
-      run: npm run build -w boilerplate/frontend
+    - name: Build Next.js Frontend
+      run: npm run build
