@@ -7,6 +7,9 @@ Enterprise Zero-Knowledge Medical Eligibility Verification built natively on the
 [![Live Video](https://img.shields.io/badge/YouTube-Live_Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/-FJ9CQxYjNU)
 [![Live Deployment](https://img.shields.io/badge/Vercel-Live_Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://medical-eligibility-verification-next-b7hew5odh-sayan-paul.vercel.app/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/paulsayan2005/Medical-Eligibility-Verification-NextJS)
+[![CI/CD Pipeline](https://img.shields.io/badge/GitHub_Actions-CI/CD_Pipeline-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/paulsayan2005/Medical-Eligibility-Verification-NextJS/actions)
+[![Smart Contract](https://img.shields.io/badge/Compact-Smart_Contract-8A2BE2?style=for-the-badge&logo=codeigniter&logoColor=white)](https://github.com/paulsayan2005/Medical-Eligibility-Verification-NextJS/tree/main/contract)
+[![Midnight Network](https://img.shields.io/badge/Midnight-Network-000000?style=for-the-badge&logo=web3.js&logoColor=white)](https://midnight.network/)
 
 ## 📸 Application Screenshots
 
